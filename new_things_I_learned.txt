@@ -1,0 +1,11 @@
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+to safely run python scripts in diffrent dir
+
+TypedDict
+for typesafety
+
+reading from json in python
+
+keyword search
+
+argparse for python cli
