@@ -9,5 +9,5 @@ wheels/
 # Virtual environments
 .venv
 
-# movie data
 /data/
+cache/
