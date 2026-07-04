@@ -1,7 +1,6 @@
 import argparse
 
-from lib.inverted_index import build_inverted_index
-from lib.keyword_search import search_command
+from lib.keyword_search import build_command, search_command
 
 
 def main() -> None:
@@ -18,14 +17,13 @@ def main() -> None:
     match args.command:
         case "build":
             print("Building inverted index...")
-            build_inverted_index()
+            build_command()
             print("Inverted index built successfully.")
-
         case "search":
             print("Searching for:", args.query)
             results = search_command(args.query)
             for i, res in enumerate(results, 1):
-                print(f"{i}. {res['title']}")
+                print(f"{i}. ({res['id']}) {res['title']}")
         case _:
             parser.print_help()
 
