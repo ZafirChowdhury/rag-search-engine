@@ -2,14 +2,12 @@ import math
 import os
 import pickle
 import string
-import sys
 from collections import Counter, defaultdict
 
 from nltk.stem import PorterStemmer
 
 from .search_utils import (
     CACHE_DIR,
-    DEFAULT_SEARCH_LIMIT,
     STOPWORDS_PATH,
     load_movies,
 )
@@ -78,57 +76,10 @@ class InvertedIndex:
 
         return math.log((total_doc_count + 1) / (term_match_doc_count + 1))
 
-
-def build_command() -> None:
-    idx = InvertedIndex()
-    idx.build()
-    idx.save()
-
-
-def load_idx_helper() -> InvertedIndex:
-    idx = InvertedIndex()
-    try:
-        idx.load()
-    except FileNotFoundError:
-        sys.exit("cache not found!")
-    return idx
-
-
-def tfidf_helper(doc_id: int, tfidf_term: str) -> str:
-    idx = load_idx_helper()
-    tf = idx.get_tf(doc_id, tfidf_term)
-    idf = idx.get_idf(tfidf_term)
-    tf_idf = tf * idf
-    return f"TF-IDF score of '{tfidf_term}' in document '{doc_id}': {tf_idf:.2f}"
-
-
-
-def get_idf_helper(term: str) -> float:
-    idx = load_idx_helper()
-    term = tokenize_single_term(term)
-    return idx.get_idf(term)
-
-
-def get_tf_helper(doc_id: str, term: str) -> int:
-    idx = load_idx_helper()
-    return idx.get_tf(doc_id, tokenize_single_term(term))
-
-
-def search_command(query: str, limit: int = DEFAULT_SEARCH_LIMIT) -> list[dict]:
-    idx = load_idx_helper()
-    query_tokens = tokenize_text(query)
-    seen, results = set(), []
-    for query_token in query_tokens:
-        matching_doc_ids = idx.get_documents(query_token)
-        for id in matching_doc_ids:
-            if id in seen:
-                continue
-            seen.add(id)
-            doc = idx.docmap[id]
-            results.append(doc)
-            if len(results) >= limit:
-                return results
-    return results
+    def get_bm25_idf(self, term: str) -> float:
+        n = len(self.docmap)
+        df = len(self.index.get(term, set()))
+        return math.log((n - df + 0.5) / (df + 0.5) + 1)
 
 
 def preprocess_text(text: str) -> str:

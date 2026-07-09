@@ -1,11 +1,12 @@
 import argparse
 
-from lib.keyword_search import (
+from lib.keyword_search_command import (
+    bm25_idf_command,
     build_command,
-    get_idf_helper,
-    get_tf_helper,
+    get_idf_command,
+    get_tf_command,
     search_command,
-    tfidf_helper
+    tfidf_command,
 )
 
 
@@ -13,40 +14,52 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Keyword Search CLI")
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
+    # build
     subparsers.add_parser("build", help="Build the inverted index")
 
+    # search
     search_parser = subparsers.add_parser("search", help="Search movies using BM25")
     search_parser.add_argument("query", type=str, help="Search query")
 
+    # tf
     search_parser = subparsers.add_parser("tf", help="Lookup term frequency")
     search_parser.add_argument(
         "doc_id", type=int, help="Document id of the term frequency"
     )
     search_parser.add_argument("term", type=str, help="Term you want to search")
 
+    # idf
     search_parser = subparsers.add_parser(
         "idf", help="Get Inverse Document Frequency of a term"
     )
-    search_parser.add_argument("idf_term", help="Term that you want to find the idf of")
+    search_parser.add_argument("term", help="Term that you want to find the idf of")
 
+    # tfidf
     search_parser = subparsers.add_parser("tfidf", help="Lookup TF-IDF")
-    search_parser.add_argument("tfidf_doc_id", type=int, help="The doc you want to search")
+    search_parser.add_argument("doc_id", type=int, help="The doc you want to search")
     search_parser.add_argument(
-        "tfidf_term", type=str, help="Term that you want to find the idf of"
+        "term", type=str, help="Term that you want to find the idf of"
+    )
+
+    # bm25idf
+    bm25_idf_parser = subparsers.add_parser(
+        "bm25idf", help="Get BM25 IDF score for a given term"
+    )
+    bm25_idf_parser.add_argument(
+        "term", type=str, help="Term to get BM25 IDF score for"
     )
 
     args = parser.parse_args()
 
     match args.command:
+        case "bm25idf":
+            print(bm25_idf_command(args.term))
         case "tfidf":
-            doc_id = args.tfidf_doc_id
-            tfidf_term = args.tfidf_term
-
-            print(tfidf_helper(doc_id, tfidf_term))
+            print(tfidf_command(args.doc_id, args.term))
         case "idf":
-            print(f"{get_idf_helper(args.idf_term):.2f}")
+            print(f"{get_idf_command(args.term):.2f}")
         case "tf":
-            print(get_tf_helper(args.doc_id, args.term))
+            print(get_tf_command(args.doc_id, args.term))
         case "build":
             print("Building inverted index...")
             build_command()
