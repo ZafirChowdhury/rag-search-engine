@@ -72,6 +72,12 @@ class InvertedIndex:
         tf = self.term_frequencies.get(doc_id)
         return tf[term] if tf else 0
 
+    def get_idf(self, term: str) -> float:
+        total_doc_count = len(self.docmap)
+        term_match_doc_count = len(self.index[term])
+
+        return math.log((total_doc_count + 1) / (term_match_doc_count + 1))
+
 
 def build_command() -> None:
     idx = InvertedIndex()
@@ -81,44 +87,26 @@ def build_command() -> None:
 
 def load_idx_helper() -> InvertedIndex:
     idx = InvertedIndex()
-
     try:
         idx.load()
     except FileNotFoundError:
         sys.exit("cache not found!")
-
     return idx
 
 
-def get_idf(term: str) -> float:
+def get_idf_helper(term: str) -> float:
     idx = load_idx_helper()
     term = tokenize_single_term(term)
-
-    total_doc_count = len(idx.docmap)
-    term_match_doc_count = len(idx.index[term])
-
-    return math.log((total_doc_count + 1) / (term_match_doc_count + 1))
+    return idx.get_idf(term)
 
 
 def get_tf_helper(doc_id: str, term: str) -> int:
-    idx = InvertedIndex()
-
-    try:
-        idx.load()
-    except FileNotFoundError:
-        sys.exit("cache not found!")
-
+    idx = load_idx_helper()
     return idx.get_tf(doc_id, tokenize_single_term(term))
 
 
 def search_command(query: str, limit: int = DEFAULT_SEARCH_LIMIT) -> list[dict]:
-    idx = InvertedIndex()
-
-    try:
-        idx.load()
-    except FileNotFoundError:
-        sys.exit("cache not found!")
-
+    idx = load_idx_helper()
     query_tokens = tokenize_text(query)
     seen, results = set(), []
     for query_token in query_tokens:
@@ -131,7 +119,6 @@ def search_command(query: str, limit: int = DEFAULT_SEARCH_LIMIT) -> list[dict]:
             results.append(doc)
             if len(results) >= limit:
                 return results
-
     return results
 
 

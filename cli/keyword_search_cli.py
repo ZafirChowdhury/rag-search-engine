@@ -1,6 +1,11 @@
 import argparse
 
-from lib.keyword_search import build_command, get_idf, get_tf_helper, search_command
+from lib.keyword_search import (
+    build_command,
+    get_idf_helper,
+    get_tf_helper,
+    search_command,
+)
 
 
 def main() -> None:
@@ -27,7 +32,7 @@ def main() -> None:
 
     match args.command:
         case "idf":
-            print(f"{get_idf(args.idf_term):.2f}")
+            print(f"{get_idf_helper(args.idf_term):.2f}")
         case "tf":
             print(get_tf_helper(args.doc_id, args.term))
         case "build":
