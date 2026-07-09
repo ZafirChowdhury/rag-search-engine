@@ -9,7 +9,7 @@ from lib.keyword_search_command import (
     search_command,
     tfidf_command,
 )
-from lib.search_utils import BM25_K1
+from lib.search_utils import BM25_K1, BM25_B
 
 
 def main() -> None:
@@ -24,22 +24,22 @@ def main() -> None:
     search_parser.add_argument("query", type=str, help="Search query")
 
     # tf
-    search_parser = subparsers.add_parser("tf", help="Lookup term frequency")
-    search_parser.add_argument(
+    tf_parser = subparsers.add_parser("tf", help="Lookup term frequency")
+    tf_parser.add_argument(
         "doc_id", type=int, help="Document id of the term frequency"
     )
-    search_parser.add_argument("term", type=str, help="Term you want to search")
+    tf_parser.add_argument("term", type=str, help="Term you want to search")
 
     # idf
-    search_parser = subparsers.add_parser(
+    idf_parser = subparsers.add_parser(
         "idf", help="Get Inverse Document Frequency of a term"
     )
-    search_parser.add_argument("term", help="Term that you want to find the idf of")
+    idf_parser.add_argument("term", help="Term that you want to find the idf of")
 
-    # tfidf
-    search_parser = subparsers.add_parser("tfidf", help="Lookup TF-IDF")
-    search_parser.add_argument("doc_id", type=int, help="The doc you want to search")
-    search_parser.add_argument(
+    # tf-idf
+    tf_idf_parser = subparsers.add_parser("tfidf", help="Lookup TF-IDF")
+    tf_idf_parser.add_argument("doc_id", type=int, help="The doc you want to search")
+    tf_idf_parser.add_argument(
         "term", type=str, help="Term that you want to find the idf of"
     )
 
@@ -51,7 +51,7 @@ def main() -> None:
         "term", type=str, help="Term to get BM25 IDF score for"
     )
 
-    # bm25tf
+    # bm25tf -b
     bm25_tf_parser = subparsers.add_parser(
         "bm25tf", help="Get BM25 TF score for a given document ID and term"
     )
@@ -60,12 +60,13 @@ def main() -> None:
     bm25_tf_parser.add_argument(
         "k1", type=float, nargs="?", default=BM25_K1, help="Tunable BM25 K1 parameter"
     )
+    bm25_tf_parser.add_argument("b", type=float, nargs="?", default=BM25_B, help="Tunable BM25 b parameter")
 
     args = parser.parse_args()
 
     match args.command:
         case "bm25tf":
-            print(bm25_tf_command(doc_id=args.doc_id, term=args.term, k1=args.k1))
+            print(bm25_tf_command(doc_id=args.doc_id, term=args.term, k1=args.k1, b=args.b))
         case "bm25idf":
             print(bm25_idf_command(args.term))
         case "tfidf":

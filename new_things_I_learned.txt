@@ -21,3 +21,5 @@ defaultdict, Counter
 Inverse Document Frequency
 
 BM25 -> why, whats better, how
+Term Frequency Saturation -> how to reduce it
+Document Length Normalization
