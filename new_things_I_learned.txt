@@ -9,3 +9,9 @@ reading from json in python
 keyword search
 
 argparse for python cli
+
+python pickle
+python object sirilization
+
+reverse index
+term frequency

@@ -2,7 +2,7 @@ import os
 import pickle
 import string
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 from nltk.stem import PorterStemmer
 
@@ -18,8 +18,10 @@ class InvertedIndex:
     def __init__(self) -> None:
         self.index = defaultdict(set)
         self.docmap = {}
+        self.term_frequencies = defaultdict(Counter)
         self.index_path = os.path.join(CACHE_DIR, "index.pkl")
         self.docmap_path = os.path.join(CACHE_DIR, "docmap.pkl")
+        self.term_frequencies_path = os.path.join(CACHE_DIR, "term_frequencies.pkl")
 
     def build(self) -> None:
         movies = load_movies()
@@ -35,15 +37,23 @@ class InvertedIndex:
             pickle.dump(self.index, f)
         with open(self.docmap_path, "wb") as f:
             pickle.dump(self.docmap, f)
+        with open(self.term_frequencies_path, "wb") as f:
+            pickle.dump(self.term_frequencies, f)
 
     def load(self) -> None:
-        if not os.path.isfile(self.index_path) or not os.path.isfile(self.docmap_path):
+        if (
+            not os.path.isfile(self.index_path)
+            or not os.path.isfile(self.docmap_path)
+            or not os.path.isfile(self.term_frequencies_path)
+        ):
             raise FileNotFoundError
 
         with open(self.index_path, "rb") as f:
             self.index = pickle.load(f)
         with open(self.docmap_path, "rb") as f:
             self.docmap = pickle.load(f)
+        with open(self.term_frequencies_path, "rb") as f:
+            self.term_frequencies = pickle.load(f)
 
     def get_documents(self, term: str) -> list[int]:
         doc_ids = self.index.get(term, set())
@@ -51,14 +61,32 @@ class InvertedIndex:
 
     def __add_document(self, doc_id: int, text: str) -> None:
         tokens = tokenize_text(text)
+
+        self.term_frequencies[doc_id].update(tokens)
+
         for token in set(tokens):
             self.index[token].add(doc_id)
+
+    def get_tf(self, doc_id, term) -> int:
+        tf = self.term_frequencies.get(doc_id)
+        return tf[term] if tf else 0
 
 
 def build_command() -> None:
     idx = InvertedIndex()
     idx.build()
     idx.save()
+
+
+def get_tf_helper(doc_id: str, term: str):
+    idx = InvertedIndex()
+
+    try:
+        idx.load()
+    except FileNotFoundError:
+        sys.exit("cache not found!")
+
+    return idx.get_tf(doc_id, tokenize_single_term(term))
 
 
 def search_command(query: str, limit: int = DEFAULT_SEARCH_LIMIT) -> list[dict]:
@@ -97,6 +125,14 @@ def load_stopwords() -> list[str]:
 
 
 STOPWORDS = load_stopwords()
+
+
+def tokenize_single_term(term: str) -> str:
+    tokens = tokenize_text(term)
+    if len(tokens) != 1:
+        raise ValueError("term must tokenize to exactly one token")
+
+    return tokens[0]
 
 
 def tokenize_text(text: str) -> list[str]:
