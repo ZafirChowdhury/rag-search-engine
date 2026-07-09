@@ -1,3 +1,4 @@
+import math
 import os
 import pickle
 import string
@@ -78,7 +79,28 @@ def build_command() -> None:
     idx.save()
 
 
-def get_tf_helper(doc_id: str, term: str):
+def load_idx_helper() -> InvertedIndex:
+    idx = InvertedIndex()
+
+    try:
+        idx.load()
+    except FileNotFoundError:
+        sys.exit("cache not found!")
+
+    return idx
+
+
+def get_idf(term: str) -> float:
+    idx = load_idx_helper()
+    term = tokenize_single_term(term)
+
+    total_doc_count = len(idx.docmap)
+    term_match_doc_count = len(idx.index[term])
+
+    return math.log((total_doc_count + 1) / (term_match_doc_count + 1))
+
+
+def get_tf_helper(doc_id: str, term: str) -> int:
     idx = InvertedIndex()
 
     try:

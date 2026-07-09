@@ -1,6 +1,6 @@
 import argparse
 
-from lib.keyword_search import build_command, get_tf_helper, search_command
+from lib.keyword_search import build_command, get_idf, get_tf_helper, search_command
 
 
 def main() -> None:
@@ -18,9 +18,16 @@ def main() -> None:
     )
     search_parser.add_argument("term", type=str, help="Term you want to search")
 
+    search_parser = subparsers.add_parser(
+        "idf", help="Get Inverse Document Frequency of a term"
+    )
+    search_parser.add_argument("idf_term", help="Term that you want to find the idf of")
+
     args = parser.parse_args()
 
     match args.command:
+        case "idf":
+            print(f"{get_idf(args.idf_term):.2f}")
         case "tf":
             print(get_tf_helper(args.doc_id, args.term))
         case "build":

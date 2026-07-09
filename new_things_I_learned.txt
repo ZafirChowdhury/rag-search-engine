@@ -15,3 +15,7 @@ python object sirilization
 
 reverse index
 term frequency
+
+defaultdict, Counter
+
+Inverse Document Frequency
