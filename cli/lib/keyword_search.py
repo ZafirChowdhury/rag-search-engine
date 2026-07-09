@@ -6,11 +6,7 @@ from collections import Counter, defaultdict
 
 from nltk.stem import PorterStemmer
 
-from .search_utils import (
-    CACHE_DIR,
-    STOPWORDS_PATH,
-    load_movies,
-)
+from .search_utils import BM25_K1, CACHE_DIR, STOPWORDS_PATH, load_movies
 
 
 class InvertedIndex:
@@ -29,6 +25,14 @@ class InvertedIndex:
             doc_description = f"{movie['title']} {movie['description']}"
             self.docmap[doc_id] = movie
             self.__add_document(doc_id, doc_description)
+
+    def __add_document(self, doc_id: int, text: str) -> None:
+        tokens = tokenize_text(text)
+
+        self.term_frequencies[doc_id].update(tokens)
+
+        for token in set(tokens):
+            self.index[token].add(doc_id)
 
     def save(self) -> None:
         os.makedirs(CACHE_DIR, exist_ok=True)
@@ -58,14 +62,6 @@ class InvertedIndex:
         doc_ids = self.index.get(term, set())
         return sorted(list(doc_ids))
 
-    def __add_document(self, doc_id: int, text: str) -> None:
-        tokens = tokenize_text(text)
-
-        self.term_frequencies[doc_id].update(tokens)
-
-        for token in set(tokens):
-            self.index[token].add(doc_id)
-
     def get_tf(self, doc_id, term) -> int:
         tf = self.term_frequencies.get(doc_id)
         return tf[term] if tf else 0
@@ -80,6 +76,10 @@ class InvertedIndex:
         n = len(self.docmap)
         df = len(self.index.get(term, set()))
         return math.log((n - df + 0.5) / (df + 0.5) + 1)
+
+    def get_bm25_tf(self, doc_id, term, k1=BM25_K1):
+        tf = self.get_tf(doc_id=doc_id, term=term)
+        return (tf * (k1 + 1)) / (tf + k1)
 
 
 def preprocess_text(text: str) -> str:

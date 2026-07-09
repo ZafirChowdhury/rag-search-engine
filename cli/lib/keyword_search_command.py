@@ -1,13 +1,7 @@
 import sys
 
 from .keyword_search import InvertedIndex, tokenize_single_term, tokenize_text
-from .search_utils import DEFAULT_SEARCH_LIMIT
-
-
-def build_command() -> None:
-    idx = InvertedIndex()
-    idx.build()
-    idx.save()
+from .search_utils import BM25_K1, DEFAULT_SEARCH_LIMIT
 
 
 def load_idx_helper() -> InvertedIndex:
@@ -17,6 +11,18 @@ def load_idx_helper() -> InvertedIndex:
     except FileNotFoundError:
         sys.exit("cache not found!")
     return idx
+
+
+def build_command() -> None:
+    idx = InvertedIndex()
+    idx.build()
+    idx.save()
+
+
+def bm25_tf_command(doc_id: int, term: str, k1=BM25_K1) -> str:
+    idx = load_idx_helper()
+    bm25tf = idx.get_bm25_tf(doc_id=doc_id, term=tokenize_single_term(term), k1=k1)
+    return f"BM25 TF score of '{term}' in document '{doc_id}': {bm25tf:.2f}"
 
 
 def bm25_idf_command(term: str) -> str:

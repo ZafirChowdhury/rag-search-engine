@@ -9,6 +9,9 @@ class Movie(TypedDict):
     description: str
 
 
+# BM25
+BM25_K1 = 1.5
+
 DEFAULT_SEARCH_LIMIT = 5
 
 # __file__ -> current file
