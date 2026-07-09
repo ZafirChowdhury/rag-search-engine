@@ -94,6 +94,15 @@ def load_idx_helper() -> InvertedIndex:
     return idx
 
 
+def tfidf_helper(doc_id: int, tfidf_term: str) -> str:
+    idx = load_idx_helper()
+    tf = idx.get_tf(doc_id, tfidf_term)
+    idf = idx.get_idf(tfidf_term)
+    tf_idf = tf * idf
+    return f"TF-IDF score of '{tfidf_term}' in document '{doc_id}': {tf_idf:.2f}"
+
+
+
 def get_idf_helper(term: str) -> float:
     idx = load_idx_helper()
     term = tokenize_single_term(term)

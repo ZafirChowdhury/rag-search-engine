@@ -5,6 +5,7 @@ from lib.keyword_search import (
     get_idf_helper,
     get_tf_helper,
     search_command,
+    tfidf_helper
 )
 
 
@@ -28,9 +29,20 @@ def main() -> None:
     )
     search_parser.add_argument("idf_term", help="Term that you want to find the idf of")
 
+    search_parser = subparsers.add_parser("tfidf", help="Lookup TF-IDF")
+    search_parser.add_argument("tfidf_doc_id", type=int, help="The doc you want to search")
+    search_parser.add_argument(
+        "tfidf_term", type=str, help="Term that you want to find the idf of"
+    )
+
     args = parser.parse_args()
 
     match args.command:
+        case "tfidf":
+            doc_id = args.tfidf_doc_id
+            tfidf_term = args.tfidf_term
+
+            print(tfidf_helper(doc_id, tfidf_term))
         case "idf":
             print(f"{get_idf_helper(args.idf_term):.2f}")
         case "tf":
