@@ -23,3 +23,13 @@ Inverse Document Frequency
 BM25 -> why, whats better, how
 Term Frequency Saturation -> how to reduce it
 Document Length Normalization
+
+
+Semantic Search
+Embedding
+
+Vectors -> semantic search
+Embedding Models
+Dot Product Similarity
+Cosine Similarity
+text -> vector embeding
