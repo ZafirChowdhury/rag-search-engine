@@ -6,15 +6,16 @@ from collections import Counter, defaultdict
 
 from nltk.stem import PorterStemmer
 
-from .search_utils import BM25_K1, BM25_B, CACHE_DIR, STOPWORDS_PATH, load_movies
+from .search_utils import BM25_K1, BM25_B, CACHE_DIR, DEFAULT_SEARCH_LIMIT, STOPWORDS_PATH, load_movies, format_search_result, SearchResult, Movie
 
 
 class InvertedIndex:
     def __init__(self) -> None:
-        self.index = defaultdict(set)
-        self.docmap = {}
-        self.term_frequencies = defaultdict(Counter)
-        self.doc_lengths = {}
+        self.index: defaultdict[str, set[int]] = defaultdict(set)
+        self.docmap: dict[int, Movie] = {}
+        self.term_frequencies: defaultdict[int, Counter[str]] = defaultdict(Counter)
+        self.doc_lengths: dict[int, int] = {}
+
         self.index_path = os.path.join(CACHE_DIR, "index.pkl")
         self.docmap_path = os.path.join(CACHE_DIR, "docmap.pkl")
         self.term_frequencies_path = os.path.join(CACHE_DIR, "term_frequencies.pkl")
@@ -95,6 +96,36 @@ class InvertedIndex:
         length_norm = 1 - b + b * (self.doc_lengths[doc_id] / self.__get_avg_doc_length())
         tf = self.get_tf(doc_id=doc_id, term=term)
         return (tf * (k1 + 1)) / (tf + k1 * length_norm)
+
+    def get_bm25(self, doc_id: int, term: str) -> float:
+        term = tokenize_single_term(term)
+        return self.get_bm25_idf(term) * self.get_bm25_tf(doc_id, term)
+
+
+    def bm25_search(self, query, limit=DEFAULT_SEARCH_LIMIT) -> list[SearchResult]:
+        tokens = tokenize_text(query)
+        scores: dict[int, float] = {}
+
+        for doc_id in self.docmap:
+            score = 0.0
+            for token in tokens:
+                score += self.get_bm25(doc_id, token)
+            scores[doc_id] = score
+
+        sorted_docs = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+
+        results: list[SearchResult] = []
+        for doc_id, score in sorted_docs[:limit]:
+            doc = self.docmap[doc_id]
+            formatted_result = format_search_result(
+                doc_id=doc["id"],
+                title=doc["title"],
+                document=doc["description"],
+                score=score,
+            )
+            results.append(formatted_result)
+
+        return results
 
 
 def preprocess_text(text: str) -> str:

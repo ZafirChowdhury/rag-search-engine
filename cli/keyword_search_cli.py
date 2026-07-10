@@ -8,8 +8,9 @@ from lib.keyword_search_command import (
     get_tf_command,
     search_command,
     tfidf_command,
+    bm25search_command,
 )
-from lib.search_utils import BM25_K1, BM25_B
+from lib.search_utils import BM25_K1, BM25_B, DEFAULT_SEARCH_LIMIT
 
 
 def main() -> None:
@@ -62,9 +63,16 @@ def main() -> None:
     )
     bm25_tf_parser.add_argument("b", type=float, nargs="?", default=BM25_B, help="Tunable BM25 b parameter")
 
+    #  bm25search
+    bm25search_parser = subparsers.add_parser("bm25search", help="Search movies using full BM25 scoring")
+    bm25search_parser.add_argument("query", type=str, help="Search query")
+    bm25search_parser.add_argument("limit", type=int, nargs="?", default=DEFAULT_SEARCH_LIMIT, help="Optional search limit")
+
     args = parser.parse_args()
 
     match args.command:
+        case "bm25search":
+            bm25search_command(args.query, args.limit)
         case "bm25tf":
             print(bm25_tf_command(doc_id=args.doc_id, term=args.term, k1=args.k1, b=args.b))
         case "bm25idf":

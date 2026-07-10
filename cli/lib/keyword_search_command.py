@@ -18,6 +18,13 @@ def build_command() -> None:
     idx.build()
     idx.save()
 
+def bm25search_command(query: str, limit=DEFAULT_SEARCH_LIMIT) -> None:
+    idx = load_idx_helper()
+    results = idx.bm25_search(query, limit=limit)
+
+    print("Searching for:", query)
+    for i, res in enumerate(results, 1):
+        print(f"{i}. ({res['id']}) {res['title']} - Score: {res['score']:.2f}")
 
 def bm25_tf_command(doc_id: int, term: str, k1=BM25_K1, b=BM25_B) -> str:
     idx = load_idx_helper()

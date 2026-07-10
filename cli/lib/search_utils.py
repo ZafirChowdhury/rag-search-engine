@@ -1,6 +1,6 @@
 import json
 import os
-from typing import TypedDict
+from typing import TypedDict, Any
 
 
 class Movie(TypedDict):
@@ -8,6 +8,12 @@ class Movie(TypedDict):
     title: str
     description: str
 
+class SearchResult(TypedDict):
+    id: int
+    title: str
+    document: str
+    score: float
+    metadata: dict[str, Any]
 
 # BM25
 BM25_K1 = 1.5
@@ -28,3 +34,15 @@ def load_movies() -> list[Movie]:
     with open(DATA_PATH, "r") as file:
         data = json.load(file)
     return data["movies"]
+
+def format_search_result(
+    doc_id: int, title: str, document: str, score: float, **metadata: Any
+) -> SearchResult:
+
+    return {
+        "id": doc_id,
+        "title": title,
+        "document": document,
+        "score": round(score, 2),
+        "metadata": metadata if metadata else {},
+    }
