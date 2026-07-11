@@ -1,14 +1,24 @@
 from .semantic_search import SemanticSearch
+from .search_utils import load_movies
+
+def verify_embeddings_command() -> None:
+    search_instance = SemanticSearch()
+    documents = load_movies()
+    embeddings = search_instance.load_or_create_embeddings(documents)
+    print(f"Number of docs:   {len(documents)}")
+    print(
+        f"Embeddings shape: {embeddings.shape[0]} vectors in {embeddings.shape[1]} dimensions"
+    )
 
 def verify_model_command() -> None:
-    ss = SemanticSearch()
+    search_instance = SemanticSearch()
 
-    print(f"Model loaded: {str(ss.model)}")
-    print(f"Max sequence length: {ss.max_seq_length}")
+    print(f"Model loaded: {str(search_instance.model)}")
+    print(f"Max sequence length: {search_instance.max_seq_length}")
 
 def embed_text_command(text: str) -> None:
-    ss = SemanticSearch()
-    embedding = ss.generate_embedding(text)
+    search_instance = SemanticSearch()
+    embedding = search_instance.generate_embedding(text)
 
     print(f"Text: {text}")
     print(f"First 3 dimensions: {embedding[:3]}")

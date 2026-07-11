@@ -24,6 +24,8 @@ BM25 -> why, whats better, how
 Term Frequency Saturation -> how to reduce it
 Document Length Normalization
 
+TF-IDF = TF * IDF
+Okapi BM25
 
 Semantic Search
 Embedding
