@@ -21,6 +21,9 @@ BM25_B = 0.75
 
 DEFAULT_SEARCH_LIMIT = 5
 
+# chunking
+DEFAULT_CHUNK_SIZE = 200
+
 # __file__ -> current file
 # os.path.dirname() -> drops the file name
 # os.path.dirname() -> os.path.dirname() -> os.path.dirname() -> project root -> cli -> lib

@@ -5,10 +5,11 @@ from lib.semantic_search_command import (
     embed_text_command,
     verify_embeddings_command,
     verify_model_command,
-    search_command
+    search_command,
+    chunk_command,
 )
 
-from lib.search_utils import DEFAULT_SEARCH_LIMIT
+from lib.search_utils import DEFAULT_SEARCH_LIMIT, DEFAULT_CHUNK_SIZE
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Semantic Search CLI")
@@ -42,12 +43,30 @@ def main() -> None:
         "-l",
         type=int,
         default=DEFAULT_SEARCH_LIMIT,
-        help="Maximum number of results to return"
+        help="Maximum number of results to return")
+
+    # chunk
+    chunk_parser = subparsers.add_parser(
+        "chunk",
+        help="Split text into chunks"
+    )
+    chunk_parser.add_argument(
+        "text",
+        type=str,
+        help="Text to chunk"
+    )
+    chunk_parser.add_argument(
+        "--chunk-size",
+        type=int,
+        default=DEFAULT_CHUNK_SIZE,
+        help="Maximum chunk size"
     )
 
     args = parser.parse_args()
 
     match args.command:
+        case "chunk":
+            chunk_command(args.text, args.chunk_size)
         case "search":
             search_command(args.query, args.limit)
         case "embed_query":

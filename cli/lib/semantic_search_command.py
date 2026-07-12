@@ -1,5 +1,24 @@
 from .semantic_search import SemanticSearch
-from .search_utils import load_movies, DEFAULT_SEARCH_LIMIT
+from .search_utils import load_movies, DEFAULT_SEARCH_LIMIT, DEFAULT_CHUNK_SIZE
+
+
+def fixed_size_chunking(text: str, chunk_size=DEFAULT_CHUNK_SIZE) -> list[str]:
+    words = text.split()
+    chunks = []
+
+    pointer = 0
+    while pointer < len(words):
+        chunk_words = words[pointer : pointer + chunk_size]
+        chunks.append(" ".join(chunk_words))
+        pointer += chunk_size
+
+    return chunks
+
+def chunk_command(text: str, chunk_size=DEFAULT_CHUNK_SIZE) -> None:
+    chunks = fixed_size_chunking(text, chunk_size)
+    print(f"Chunking {len(text)} characters")
+    for i, chunk in enumerate(chunks):
+        print(f"{i + 1}. {chunk}")
 
 def search_command(query: str, limit=DEFAULT_SEARCH_LIMIT) -> None:
     search_instance = SemanticSearch()

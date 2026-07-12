@@ -35,3 +35,8 @@ Embedding Models
 Dot Product Similarity
 Cosine Similarity
 text -> vector embeding
+
+Locality-Sensitive Hashing
+vector database (just into, why they are useful)
+
+Chunking
