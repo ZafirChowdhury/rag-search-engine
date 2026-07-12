@@ -1,5 +1,16 @@
 from .semantic_search import SemanticSearch
-from .search_utils import load_movies
+from .search_utils import load_movies, DEFAULT_SEARCH_LIMIT
+
+def search_command(query: str, limit=DEFAULT_SEARCH_LIMIT) -> None:
+    search_instance = SemanticSearch()
+    documents = load_movies()
+    search_instance.load_or_create_embeddings(documents)
+
+    results = search_instance.search(query, limit)
+    for i, result in enumerate(results, start=1):
+        truncated = result["description"][:100] + "..." if len(result["description"]) > 100 else result["description"]
+        print(f"{i}. {result['title']} (score: {result['score']:.4f})")
+        print(truncated)
 
 def embed_query_text_command(query: str) -> None:
     search_instance = SemanticSearch()

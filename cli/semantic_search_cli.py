@@ -5,7 +5,10 @@ from lib.semantic_search_command import (
     embed_text_command,
     verify_embeddings_command,
     verify_model_command,
+    search_command
 )
+
+from lib.search_utils import DEFAULT_SEARCH_LIMIT
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Semantic Search CLI")
@@ -27,9 +30,26 @@ def main() -> None:
     embed_query_parser = subparsers.add_parser("embed_query", help="generate embeding for user query")
     embed_query_parser.add_argument("query", help="query to be embeded")
 
+    # search
+    search_parser = subparsers.add_parser("search", help="Semantic search")
+    search_parser.add_argument(
+        "query",
+        type=str,
+        help="Search query"
+    )
+    search_parser.add_argument(
+        "--limit",
+        "-l",
+        type=int,
+        default=DEFAULT_SEARCH_LIMIT,
+        help="Maximum number of results to return"
+    )
+
     args = parser.parse_args()
 
     match args.command:
+        case "search":
+            search_command(args.query, args.limit)
         case "embed_query":
             embed_query_text_command(args.query)
         case "verify_embeddings":
