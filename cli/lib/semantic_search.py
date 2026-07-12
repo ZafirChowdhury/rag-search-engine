@@ -19,7 +19,7 @@ class SemanticSearch:
         self.documents = None
         self.document_map = {}
 
-    def generate_embedding(self, text):
+    def generate_embedding(self, text: str):
         if len(text.strip()) == 0:
            raise ValueError("cannot generate embeding for a empty string")
 
