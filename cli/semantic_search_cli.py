@@ -9,7 +9,7 @@ from lib.semantic_search_command import (
     chunk_command,
 )
 
-from lib.search_utils import DEFAULT_SEARCH_LIMIT, DEFAULT_CHUNK_SIZE
+from lib.search_utils import DEFAULT_SEARCH_LIMIT, DEFAULT_CHUNK_SIZE, DEFAULT_CHUNK_OVERLAP
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Semantic Search CLI")
@@ -61,12 +61,18 @@ def main() -> None:
         default=DEFAULT_CHUNK_SIZE,
         help="Maximum chunk size"
     )
+    chunk_parser.add_argument(
+        "--overlap",
+        type=int,
+        default=DEFAULT_CHUNK_OVERLAP,
+        help="Overlap size"
+    )
 
     args = parser.parse_args()
 
     match args.command:
         case "chunk":
-            chunk_command(args.text, args.chunk_size)
+            chunk_command(args.text, args.chunk_size, args.overlap)
         case "search":
             search_command(args.query, args.limit)
         case "embed_query":

@@ -23,6 +23,7 @@ DEFAULT_SEARCH_LIMIT = 5
 
 # chunking
 DEFAULT_CHUNK_SIZE = 200
+DEFAULT_CHUNK_OVERLAP = 1
 
 # __file__ -> current file
 # os.path.dirname() -> drops the file name
