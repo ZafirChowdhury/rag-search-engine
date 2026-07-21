@@ -12,8 +12,8 @@ from .search_utils import Movie, MOVIE_EMBEDDINGS_PATH, DEFAULT_SEARCH_LIMIT
 EmbeddingArray = NDArray[Any]
 
 class SemanticSearch:
-    def __init__(self) -> None:
-        self.model = SentenceTransformer('all-MiniLM-L6-v2')
+    def __init__(self, model_name="all-MiniLM-L6-v2") -> None:
+        self.model = SentenceTransformer(model_name)
         self.max_seq_length = 256
         self.embeddings = None
         self.documents = None
