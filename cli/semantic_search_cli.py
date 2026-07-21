@@ -7,6 +7,7 @@ from lib.semantic_search_command import (
     verify_model_command,
     search_command,
     chunk_command,
+    semantic_chunk_command,
 )
 
 from lib.search_utils import DEFAULT_SEARCH_LIMIT, DEFAULT_CHUNK_SIZE, DEFAULT_CHUNK_OVERLAP
@@ -68,9 +69,31 @@ def main() -> None:
         help="Overlap size"
     )
 
+    # semantic_chunk
+    semantic_chunk_parser = subparsers.add_parser("semantic_chunk", help="Semantic search")
+    semantic_chunk_parser.add_argument(
+        "text",
+        type=str,
+        help="Text to chunk"
+    )
+    semantic_chunk_parser.add_argument(
+        "--max-chunk-size",
+        type=int,
+        default=4,
+        help="Maximum chunk size"
+    )
+    semantic_chunk_parser.add_argument(
+        "--overlap",
+        type=int,
+        default=0,
+        help="Maximum overlap size"
+    )
+
     args = parser.parse_args()
 
     match args.command:
+        case "semantic_chunk":
+            semantic_chunk_command(args.text, args.max_chunk_size, args.overlap)
         case "chunk":
             chunk_command(args.text, args.chunk_size, args.overlap)
         case "search":

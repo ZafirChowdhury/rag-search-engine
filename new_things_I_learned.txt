@@ -40,3 +40,4 @@ Locality-Sensitive Hashing
 vector database (just into, why they are useful)
 
 Chunking
+Semantic Chunking
