@@ -1,14 +1,19 @@
 from .semantic_search import SemanticSearch
-from .search_utils import load_movies, DEFAULT_SEARCH_LIMIT, DEFAULT_CHUNK_SIZE, DEFAULT_CHUNK_OVERLAP
-from .chunked_semantic_search import semantic_chunk
+from .search_utils import load_movies, DEFAULT_SEARCH_LIMIT, DEFAULT_CHUNK_SIZE, DEFAULT_CHUNK_OVERLAP, DEFAULT_SEMANTIC_CHUNK_SIZE
+from .chunked_semantic_search import semantic_chunk, ChunkedSemanticSearch
 
-def semantic_chunk_command(text: str, max_chunk_size=4, overlap=0) -> None:
+def embed_chunks_command():
+    movies = load_movies()
+    searcher = ChunkedSemanticSearch()
+    return searcher.load_or_create_chunk_embeddings(movies)
+
+def semantic_chunk_command(text: str, max_chunk_size=DEFAULT_SEMANTIC_CHUNK_SIZE, overlap=DEFAULT_CHUNK_OVERLAP) -> None:
     chunks = semantic_chunk(text, max_chunk_size, overlap)
     print(f"Semantically chunking {len(text)} characters")
     for i, line in enumerate(chunks, start=1):
         print(f"{i} {line}")
 
-def fixed_size_chunking(text: str, chunk_size: int = DEFAULT_CHUNK_SIZE, overlap: int = DEFAULT_CHUNK_OVERLAP) -> list[str]:
+def fixed_size_chunking(text: str, chunk_size: int = DEFAULT_SEMANTIC_CHUNK_SIZE, overlap: int = DEFAULT_CHUNK_OVERLAP) -> list[str]:
     words = text.split()
     chunks = []
 

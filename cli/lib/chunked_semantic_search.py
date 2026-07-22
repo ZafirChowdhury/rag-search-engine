@@ -5,8 +5,8 @@ import numpy as np
 from typing import TypedDict, Any
 from numpy.typing import NDArray
 
-from semantic_search import SemanticSearch
-from search_utils import CHUNK_EMBEDDINGS_PATH, CHUNK_METADATA_PATH
+from .semantic_search import SemanticSearch
+from .search_utils import CHUNK_EMBEDDINGS_PATH, CHUNK_METADATA_PATH, DEFAULT_SEMANTIC_CHUNK_SIZE, DEFAULT_CHUNK_OVERLAP
 
 class ChunkMetadata(TypedDict):
     movie_idx: int
@@ -15,20 +15,18 @@ class ChunkMetadata(TypedDict):
 
 EmbeddingArray = NDArray[Any]
 
-def semantic_chunk(text: str, max_chunk_size=4, overlap=0) -> list:
+def semantic_chunk(text: str, max_chunk_size: int = DEFAULT_SEMANTIC_CHUNK_SIZE, overlap: int = DEFAULT_CHUNK_OVERLAP) -> list[str]:
     sentences = re.split(r"(?<=[.!?])\s+", text)
-
     chunks = []
-    step = max_chunk_size - overlap
-    if step <= 0:
-        raise ValueError("Chunk size must be bigger then overlap")
 
-    pointer = 0
-    while pointer < len(sentences):
-        chunk = " ".join(sentences[pointer : pointer + max_chunk_size])
-        chunks.append(chunk)
-
-        pointer += step
+    i = 0
+    n_sentences = len(sentences)
+    while i < n_sentences:
+        chunk_sentences = sentences[i : i + max_chunk_size]
+        if chunks and len(chunk_sentences) <= overlap:
+            break
+        chunks.append(" ".join(chunk_sentences))
+        i += max_chunk_size - overlap
 
     return chunks
 
@@ -38,7 +36,7 @@ class ChunkedSemanticSearch(SemanticSearch):
          self.chunk_embeddings = None
          self.chunk_metadata = None
 
-    def build_chunk_embeddings(self, documents: list[dict]) -> np.ndarray:
+    def build_chunk_embeddings(self, documents) -> np.ndarray:
         self.documents = documents
 
         self.document_map = {}
@@ -73,3 +71,20 @@ class ChunkedSemanticSearch(SemanticSearch):
                 ) # why use json for chunk metadata??
 
         return self.chunk_embeddings
+
+    def load_or_create_chunk_embeddings(self, documents) -> np.ndarray:
+        self.documents = documents
+        self.document_map = {}
+        for doc in documents:
+            self.document_map[doc["id"]] = doc
+
+        if os.path.exists(CHUNK_EMBEDDINGS_PATH) and os.path.exists(CHUNK_METADATA_PATH):
+            self.chunk_embeddings = np.load(CHUNK_EMBEDDINGS_PATH)
+
+            with open(CHUNK_METADATA_PATH, "r") as f:
+                data = json.load(f)
+                self.chunk_metadata = data["chunks"]
+
+            return self.chunk_embeddings
+
+        return self.build_chunk_embeddings(documents)
