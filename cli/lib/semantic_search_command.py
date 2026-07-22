@@ -1,23 +1,9 @@
 from .semantic_search import SemanticSearch
 from .search_utils import load_movies, DEFAULT_SEARCH_LIMIT, DEFAULT_CHUNK_SIZE, DEFAULT_CHUNK_OVERLAP
-
-import re
+from .chunked_semantic_search import semantic_chunk
 
 def semantic_chunk_command(text: str, max_chunk_size=4, overlap=0) -> None:
-    sentences = re.split(r"(?<=[.!?])\s+", text)
-
-    chunks = []
-    step = max_chunk_size - overlap
-    if step <= 0:
-        raise ValueError("Chunk size must be bigger then overlap")
-
-    pointer = 0
-    while pointer < len(sentences):
-        chunk = " ".join(sentences[pointer : pointer + max_chunk_size])
-        chunks.append(chunk)
-
-        pointer += step
-
+    chunks = semantic_chunk(text, max_chunk_size, overlap)
     print(f"Semantically chunking {len(text)} characters")
     for i, line in enumerate(chunks, start=1):
         print(f"{i} {line}")
