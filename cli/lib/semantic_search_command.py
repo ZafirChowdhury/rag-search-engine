@@ -1,11 +1,25 @@
 from .semantic_search import SemanticSearch
-from .search_utils import load_movies, DEFAULT_SEARCH_LIMIT, DEFAULT_CHUNK_SIZE, DEFAULT_CHUNK_OVERLAP, DEFAULT_SEMANTIC_CHUNK_SIZE
+from .search_utils import load_movies, SearchResult, DEFAULT_SEARCH_LIMIT, DEFAULT_CHUNK_SIZE, DEFAULT_CHUNK_OVERLAP, DEFAULT_SEMANTIC_CHUNK_SIZE
 from .chunked_semantic_search import semantic_chunk, ChunkedSemanticSearch
 
-def embed_chunks_command():
+def search_chunked_command(query: str, limit: int = DEFAULT_SEARCH_LIMIT) -> None:
     movies = load_movies()
     searcher = ChunkedSemanticSearch()
-    return searcher.load_or_create_chunk_embeddings(movies)
+    searcher.load_or_create_chunk_embeddings(movies)
+    results = searcher.search_chunks(query, limit)
+    result = {"query": query, "results": results}
+
+    print(f"Query: {result['query']}")
+    print("Results:")
+    for i, res in enumerate(result["results"], 1):
+        print(f"\n{i}. {res['title']} (score: {res['score']:.4f})")
+        print(f"   {res['document']}...")
+
+def embed_chunks_command() -> None:
+    movies = load_movies()
+    searcher = ChunkedSemanticSearch()
+    embeddings = searcher.load_or_create_chunk_embeddings(movies)
+    print(f"Generated {len(embeddings)} chunked embeddings")
 
 def semantic_chunk_command(text: str, max_chunk_size=DEFAULT_SEMANTIC_CHUNK_SIZE, overlap=DEFAULT_CHUNK_OVERLAP) -> None:
     chunks = semantic_chunk(text, max_chunk_size, overlap)
