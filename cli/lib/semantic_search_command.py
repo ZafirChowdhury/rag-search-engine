@@ -25,7 +25,7 @@ def semantic_chunk_command(text: str, max_chunk_size=DEFAULT_SEMANTIC_CHUNK_SIZE
     chunks = semantic_chunk(text, max_chunk_size, overlap)
     print(f"Semantically chunking {len(text)} characters")
     for i, line in enumerate(chunks, start=1):
-        print(f"{i} {line}")
+        print(f"{i}. {line}")
 
 def fixed_size_chunking(text: str, chunk_size: int = DEFAULT_SEMANTIC_CHUNK_SIZE, overlap: int = DEFAULT_CHUNK_OVERLAP) -> list[str]:
     words = text.split()

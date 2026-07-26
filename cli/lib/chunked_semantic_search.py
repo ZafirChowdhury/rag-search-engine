@@ -16,9 +16,23 @@ class ChunkMetadata(TypedDict):
 EmbeddingArray = NDArray[Any]
 
 def semantic_chunk(text: str, max_chunk_size: int = DEFAULT_SEMANTIC_CHUNK_SIZE, overlap: int = DEFAULT_CHUNK_OVERLAP) -> list[str]:
-    sentences = re.split(r"(?<=[.!?])\s+", text)
-    chunks = []
+    text = text.strip()
+    if text == "":
+        return []
 
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+
+    if len(sentences) == 1 and sentences[0].endswith((".", "!", "?")):
+        return [text]
+
+    filtered_sentences = []
+    for sentence in sentences:
+        fs = sentence.strip()
+        if fs != "":
+            filtered_sentences.append(fs)
+    sentences = filtered_sentences
+
+    chunks = []
     i = 0
     n_sentences = len(sentences)
     while i < n_sentences:
