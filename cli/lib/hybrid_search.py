@@ -1,3 +1,4 @@
+from numpy import number
 import os
 
 from .keyword_search import InvertedIndex
@@ -23,3 +24,21 @@ class HybridSearch:
 
     def rrf_search(self, query: str, k: int, limit: int = 10) -> list[dict]:
         raise NotImplementedError("RRF hybrid search is not implemented yet.")
+
+
+def min_max_normalization(numbers: list) -> list:
+    if not numbers or len(numbers) == 0:
+        return []
+
+    mn = min(numbers)
+    mx = max(numbers)
+    normalized_score = []
+
+    if mn == mx:
+        return [1.0 for _ in range(len(numbers))]
+
+    for score in numbers:
+        n_score = (score - mn) / (mx - mn)
+        normalized_score.append(n_score)
+
+    return normalized_score
