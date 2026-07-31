@@ -46,4 +46,6 @@ ColBERT -> only what it is, how it works, trade offs (did not impliment)
 doc/chunk -> represented by muultiple vectors not only 1
 one vector per token
 
-Late Chunking
+Late Chunking -> only what it is, how it works, trade offs (did not impliment)
+
+hybrid search
