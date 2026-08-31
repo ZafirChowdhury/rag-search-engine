@@ -17,6 +17,7 @@ class SearchResult(TypedDict):
 
 # Hybrid
 DEFAULT_ALPHA = 0.5
+RRF_K = 60
 
 # BM25
 BM25_K1 = 1.5
